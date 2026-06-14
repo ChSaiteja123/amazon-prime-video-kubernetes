@@ -1,8 +1,8 @@
 pipeline{
     agent any
     tools{
-        jdk 'jdk'
-        nodejs 'node17'
+        jdk 'jdk-17'
+        nodejs 'node-17'
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
@@ -15,12 +15,12 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/Aseemakram19/amazon-prime-video-kubernetes.git'
+                git branch: 'main', url: 'https://github.com/ChSaiteja123/amazon-prime-video-kubernetes.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('sonar') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=amazon-prime-video \
                     -Dsonar.projectKey=amazon-prime-video '''
                 }
@@ -29,7 +29,7 @@ pipeline{
         stage("quality gate"){
            steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
                 }
             } 
         }
@@ -48,8 +48,8 @@ pipeline{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
                        sh "docker build -t amazon-prime-video ."
-                       sh "docker tag amazon-prime-video aseemakram19/amazon-prime-video:latest "
-                       sh "docker push aseemakram19/amazon-prime-video:latest "
+                       sh "docker tag amazon-prime-video saitejch/amazon-prime-video:latest "
+                       sh "docker push saitejch/amazon-prime-video:latest "
                     }
                 }
             }
@@ -57,10 +57,10 @@ pipeline{
 		stage('Docker Scout Image') {
             steps {
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh 'docker-scout quickview aseemakram19/amazon-prime-video:latest'
-                       sh 'docker-scout cves aseemakram19/amazon-prime-video:latest'
-                       sh 'docker-scout recommendations aseemakram19/amazon-prime-video:latest'
+                   withDockerRegistry(credentialsId: 'docker'){
+                       sh 'docker-scout quickview saitejch/amazon-prime-video:latest'
+                       sh 'docker-scout cves saitejch/amazon-prime-video:latest'
+                       sh 'docker-scout recommendations saitejch/amazon-prime-video:latest'
                    }
                 }
             }
@@ -68,12 +68,12 @@ pipeline{
 
         stage("TRIVY-docker-images"){
             steps{
-                sh "trivy image aseemakram19/amazon-prime-video:latest > trivyimage.txt" 
+                sh "trivy image saitejch/amazon-prime-video:latest > trivyimage.txt" 
             }
         }
         stage('App Deploy to Docker container'){
             steps{
-                sh 'docker run -d --name amazon-prime-video -p 3000:3000 aseemakram19/amazon-prime-video:latest'
+                sh 'docker run -d --name amazon-prime-video -p 3000:3000 saitejch/amazon-prime-video:latest'
             }
         }
 
@@ -94,9 +94,9 @@ pipeline{
                     <p>Started by: ${buildUser}</p>
                     <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                 """,
-                to: 'mohdaseemakram19@gmail.com',
-                from: 'mohdaseemakram19@gmail.com',
-                replyTo: 'mohdaseemakram19@gmail.com',
+                to: 'chsai4576@gmail.com',
+                from: 'chsai4576@gmail.com',
+                replyTo: 'chsai4576@gmail.com',
                 mimeType: 'text/html',
                 attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
             )
