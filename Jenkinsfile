@@ -6,6 +6,7 @@ pipeline{
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
+		
     }
     stages {
         stage('clean workspace'){
@@ -22,7 +23,7 @@ pipeline{
             steps{
                 withSonarQubeEnv('sonar') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=amazon-prime-video \
-                    -Dsonar.projectKey=amazon-prime-video '''
+                    -Dsonar.projectKey=amazon-prime-video -Dsonar.login='Sonar-token' '''
                 }
             }
         }
