@@ -15,7 +15,7 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/ChSaiteja123/starbucks-kubernetes.git'
+                git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/ChSaiteja123/amazon-prime-video-kubernetes.git'
             }
         }
         stage("Sonarqube Analysis "){
@@ -47,22 +47,22 @@ pipeline{
             steps{
                 script{
                     withDockerRegistry(credentialsId: 'docker'){   
-                       sh "docker build -t starbucks ."
-                       sh "docker tag starbucks saitejch/starbucks:latest "
-                       sh "docker push saitejch/starbucks:latest "
+                       sh "docker build -t amazon-prime-video ."
+                       sh "docker tag amazon-prime-video saitejch/starbucks:latest "
+                       sh "docker push saitejch/amazon-prime-video:latest "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image saitejch/starbucks:latest > trivyimage.txt" 
+                sh "trivy image saitejch/amazon-prime-video:latest > trivyimage.txt" 
             }
         }
         stage('App Deploy to Docker container'){
             steps{
-                sh 'docker rm -f starbucks || true'
-                sh 'docker run -d --name starbucks -p 3030:3000 saitejch/starbucks:latest'
+                sh 'docker rm -f amazon-prime-video || true'
+                sh 'docker run -d --name amazon-prime-video -p 3030:3000 saitejch/starbucks:latest'
             }
         }
         stage('Deploy to EKS Cluster') {
