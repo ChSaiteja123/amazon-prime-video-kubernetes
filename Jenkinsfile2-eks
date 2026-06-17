@@ -62,7 +62,7 @@ pipeline{
         stage('App Deploy to Docker container'){
             steps{
                 sh 'docker rm -f amazon-prime-video || true'
-                sh 'docker run -d --name amazon-prime-video -p 3030:3000 saitejch/starbucks:latest'
+                sh 'docker run -d --name amazon-prime-video -p 3032:3000 saitejch/starbucks:latest'
             }
         }
         stage('Deploy to EKS Cluster') {
